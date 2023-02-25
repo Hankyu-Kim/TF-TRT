@@ -203,14 +203,13 @@ def benchmark_tftrt(input_saved_model):
  
 benchmark_tftrt(".") 
 ```
- 
-
- 
+<br/><br/>
 
 results of 'test.py'
 
 Nano : 5 fps -> 7 fps, NX : 7 fps -> 12 fps, AGX : 15 fps -> 30 fps 
  
+<br/><br/><br/><br/>
 
 ※ when you do not have enough memory
 
@@ -269,7 +268,7 @@ https://github.com/JetsonHacksNano/installSwapfile 
 
  	 
 
-4. GUI deactivation
+4. GUI deactivation (will help you to save more memory)
 
   
 ```
