@@ -115,7 +115,7 @@ max_workspace_size_bytes: integer, Maximum GPU memory for TF-TRT
 
 after put 'saved mode.pb' from Tensorflow on SAVED_MODEL_DIR location,  
 ```
-python3 tf-trt.py$ python3 tf-trt.py 
+python3 tf-trt.py
 ```
 after that, you may check new tensorRT optimized .pb file on OUTPUT_SAVED_MODEL_DIR. 
 
