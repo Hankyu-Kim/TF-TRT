@@ -216,9 +216,9 @@ Nano : 5 fps -> 7 fps, NX : 7 fps -> 12 fps, AGX : 15 fps -> 30 fps
 
 #### 1. zram (memory compaction) extension
 
-to make zram 2gb(default) to 4gb  
+This makes zram 2GB(default) to 4GB  
 
-you can easily change through shell script file from the link
+You can easily modify by following shell script file from the link!
  	
 https://github.com/JetsonHacksNano/resizeSwapMemory  
 
