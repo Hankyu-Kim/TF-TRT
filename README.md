@@ -4,7 +4,7 @@
 
 - SD Card Image Method 
 
-** 1. docker installation (L4T R32.7.1) 
+**1. docker installation (L4T R32.7.1)**
 
 We have to install l4t r32.7.1 which is for Jetpack 4.6.3. 
 ```
@@ -29,7 +29,7 @@ sudo pip3 install --extra-index-url https://developer.download.nvidia.com/comput
 
  
 
-** 2. Frozen graph – saved model coversion 'frozen_graph_to_saved_model.py'
+**2. Frozen graph – saved model coversion 'frozen_graph_to_saved_model.py'**
 
 Normally, we can save information of our model / training with .pb filename extension from Tensorflow 
 
@@ -93,7 +93,7 @@ On our example, model is ssd mobilenet v1, 'num_detections', 'detection_scores',
 
  <br/><br/>
 
-** 3. tf-trt ptimization from saved model
+**3. tf-trt ptimization from saved model**
 
 <br/><br/>
 
