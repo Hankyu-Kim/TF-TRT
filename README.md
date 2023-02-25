@@ -26,7 +26,7 @@ sudo pip3 install -U numpy==1.19.4 future mock keras_preprocessing keras_applica
 sudo pip3 install --extra-index-url https://developer.download.nvidia.com/compute/redist/jp/v461 tensorflow 
 ```
  
-
+<br/>
  
 
 **2. Frozen graph – saved model coversion 'frozen_graph_to_saved_model.py'**
@@ -95,11 +95,7 @@ On our example, model is ssd mobilenet v1, 'num_detections', 'detection_scores',
 
 **3. tf-trt ptimization from saved model**
 
-<br/><br/>
-
 build file 'tf-trt.py'
-
-<br/>
 
 ※ parameter
 
