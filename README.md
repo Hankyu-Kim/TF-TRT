@@ -91,11 +91,15 @@ On our example, model is ssd mobilenet v1, 'num_detections', 'detection_scores',
 
 (If you don't have any knowledge of your model's output node, you may have to use some method to figure out.)
 
- 
+ <br/><br/>
 
 ** 3. tf-trt ptimization from saved model **
 
+<br/><br/>
+
 build file 'tf-trt.py'
+
+<br/>
 
 ※ parameter
 
@@ -105,7 +109,7 @@ Input_fn : Input of converter build, you need to make the size of the image all 
 
 max_workspace_size_bytes: integer, Maximum GPU memory for TF-TRT
 
-  
+<br/>
 
 ※ command example
 
@@ -115,7 +119,8 @@ python3 tf-trt.py$ python3 tf-trt.py
 ```
 after that, you may check new tensorRT optimized .pb file on OUTPUT_SAVED_MODEL_DIR. 
 
- 
+<br/>
+
 ```
 import tensorflow as tf 
 from tensorflow.python.compiler.tensorrt import trt_convert as trt 
