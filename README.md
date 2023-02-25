@@ -212,11 +212,9 @@ Nano : 5 fps -> 7 fps, NX : 7 fps -> 12 fps, AGX : 15 fps -> 30 fps
  
 <br/><br/>
 
-※ when you do not have enough memory
+### ※ when you do not have enough memory
 
-1. zram (memory compaction) extension
-
- 	 
+#### 1. zram (memory compaction) extension
 
 to make zram 2gb(default) to 4gb  
 
@@ -224,31 +222,16 @@ you can easily change through shell script file from the link
  	
 https://github.com/JetsonHacksNano/resizeSwapMemory  
 
- 	 
-
- 	 
-
-2. zram cancellation
-
-  
+#### 2. zram cancellation
 
 if you allocate zram too much, it might cause poor performance, if you need more memory, use swap file.
-
   
 ```
 sudo systemctl disable nvzramconfig  
 ```
-  
-
 https://github.com/dusty-nv/jetson-inference/blob/master/docs/pytorch-transfer-learning.md  
 
- 	 
-
- 	 
-
-3. swap file setting
-
- 	 
+#### 3. swap file setting
 
 Tensorflow usually allocate gpu memory with virtual mcachine form.
 
@@ -265,11 +248,8 @@ You can easily modify using shell script files in the link.
 
 https://github.com/JetsonHacksNano/installSwapfile  
 
- 	 
 
- 	 
-
-4. GUI deactivation (will help you to save more memory)
+#### 4. GUI deactivation (will help you to save more memory)
 
   
 ```
