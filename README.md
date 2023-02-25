@@ -152,7 +152,7 @@ converter.summary()
 converter.build(input_fn=input_fn) 
 converter.save(output_saved_model_dir=OUTPUT_SAVED_MODEL_DIR) 
 ```
- 
+  <br/><br/>
 
 2. test file for checking speed - 'test.py' 
 ```
@@ -204,13 +204,13 @@ def benchmark_tftrt(input_saved_model):
  
 benchmark_tftrt(".") 
 ```
-<br/><br/>
+<br/>
 
 results of 'test.py'
 
 Nano : 5 fps -> 7 fps, NX : 7 fps -> 12 fps, AGX : 15 fps -> 30 fps 
  
-<br/><br/><br/><br/>
+<br/><br/>
 
 ※ when you do not have enough memory
 
