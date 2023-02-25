@@ -1,12 +1,12 @@
-# TF-TRT 를 이용한 Jetson 환경에서의 객체 인식 모델 구동 
+# Running object detection model on jetson platform using TF-TRT
 
 - Jetpack 4.6.3 (https://developer.nvidia.com/jetpack-sdk-463) 
 
 - SD Card Image Method 
 
-** 1. 도커 L4T R32.7.1 설치 **
+** 1. docker installation (L4T R32.7.1) **
 
-Jetpack 4.6.3에 해당하는 l4t r32.7.1을 설치해야한다. 
+We have to install l4t r32.7.1 which is for Jetpack 4.6.3. 
 ```
 $ sudo docker pull nvcr.io/nvidia/l4t-tensorflow:r35.2.1-tf2.11-py3 
 $ sudo docker run -it --rm --runtime nvidia --network host -v /home/user/project:/location/in/container nvcr.io/nvidia/l4t-tensorflow:r35.2.1-tf2.11-py3 
@@ -15,7 +15,7 @@ $ sudo docker run -it --rm --runtime nvidia --network host -v /home/user/project
 
   
 
- ※ (Optional) Tensorflow 직접 설치 
+ ※ (Optional) Tensorflow installation locally.
 ```
 $ sudo apt-get update 
 $ sudo apt-get install libhdf5-serial-dev hdf5-tools libhdf5-dev zlib1g-dev zip libjpeg8-dev $ liblapack-dev libblas-dev gfortran                                                                                                  
@@ -29,13 +29,13 @@ $ sudo pip3 install --extra-index-url https://developer.download.nvidia.com/comp
 
  
 
-** 2. Frozen graph – saved model 변환 파일 frozen_graph_to_saved_model.py **
+** 2. Frozen graph – saved model coversion 'frozen_graph_to_saved_model.py' **
 
-Tensorflow에서 모델에 대한 정보 / 학습에 대한 정보를 .pb확장자명으로 저장할 수 있다. 
+Normally, we can save information of our model / training with .pb filename extension from Tensorflow 
 
-두가지 방법으로 나뉜다. 1) Frozen graph 2) saved model이다. 
+There is two ways - 1) Frozen graph 2) saved model
 
-현재 본인이 가지고 있는 파일이frozen graph 형식인 경우 파라미터 변경이 불가능하기 때문에, tensorRT를 사용하기위해 saved model형식으로 변환하여야 한다. 
+If you currently have frozen graph form, we cannot change parameter inside, so we do have to change it to saved model form.
 ```
 import numpy as np 
 from tensorflow.keras.preprocessing import image 
@@ -85,33 +85,35 @@ def benchmark_tftrt(input_saved_model):
  
 benchmark_tftrt(".") 
 ```
-frozen graph에서 saved model로 변환하기 위해 모델의 출력 노드를 알아야 한다.  
+when we change frozen graph to saved model, we have to know information about output node.  
 
-예제에서 적용한 모델은 ssd mobilenet v1을 이용한 것으로 'num_detections', 'detection_scores', 'detection_boxes', 'detection_classes' 4개의 노드를 출력으로 가진다. 
+On our example, model is ssd mobilenet v1, 'num_detections', 'detection_scores', 'detection_boxes', 'detection_classes' are output nodes.
+
+(If you don't have any knowledge of your model's output node, you may have to use some method to figure out.)
 
  
 
-** 3. saved model 파일을 이용한 tf-trt 최적화 **
+** 3. tf-trt ptimization from saved model **
 
-빌드 파일 tf-trt.py 
+build file 'tf-trt.py'
 
-※ 파라미터 
+※ parameter
 
-VirtualDeviceConfiguration.memory_limit : 가상 기기(여기에서는 GPU)에 할당할 최대 메모리(MB) 
+VirtualDeviceConfiguration.memory_limit : Maximum memory (MB) to allocate on virtual device(here, GPU)-
 
-Input_fn : converter build의 입력으로 이미지의 크기를 맞춰주어야한다. 
+Input_fn : Input of converter build, you need to make the size of the image all equal. 
 
-max_workspace_size_bytes: 정수, TensorRT에 사용 가능한 최대 GPU 메모리 크기 
+max_workspace_size_bytes: integer, Maximum GPU memory for TF-TRT
 
   
 
-※ 실행 명령 예시 
+※ command example
 
-Tensorflow의 saved mode.pb을 SAVED_MODEL_DIR의 위치에 넣어준뒤,  
+after put 'saved mode.pb' from Tensorflow on SAVED_MODEL_DIR location,  
 ```
 $ python3 tf-trt.py$ python3 tf-trt.py 
 ```
-이후 OUTPUT_SAVED_MODEL_DIR의 위치에 tensorRT가 적용된 .pb파일이 생성된것을 확인할 수 있습니다. 
+after that, you may check new tensorRT optimized .pb file on OUTPUT_SAVED_MODEL_DIR. 
 
  
 ```
@@ -151,7 +153,7 @@ converter.save(output_saved_model_dir=OUTPUT_SAVED_MODEL_DIR)
 ```
  
 
-2. 실행속도 단축의 정도를 판단하기위한 테스트파일 test.py 
+2. test file for checking speed - 'test.py' 
 ```
 import numpy as np 
 from tensorflow.keras.preprocessing import image 
@@ -205,100 +207,37 @@ benchmark_tftrt(".")
 
  
 
-test.py의 출력은 다음과 같이 나옵니다. 
+results of 'test.py'
 
 Nano : 5 fps -> 7 fps, NX : 7 fps -> 12 fps, AGX : 15 fps -> 30 fps 
-
-[Nano] 
-
  
 
-[AGX] 
+※ when you do not have enough memory
 
- 
-
- 
-
- 
-
-※정확도(예측률) 비교 
-
-명확한 input 
-
-72% -> 84% 
-
-정답에 대한 예측률이 더 좋아짐 
-
- 
-
- 
-
-정답 예측률이 더 안좋아지는 경우도 있음 
-
-90% -> 53% 
-
- 
-
- 
-
-멀리있어 식별이 어려운경우 & 뒤쪽 신호등이 함께 보일때 
-
-78%, 97%(오답 : 직진신호를 좌회전신호로 인식) 
-
--> 78%, 96%(마찬가지로 오답인식) 
-
- 
-
-화면 중앙에서 벗어나 가장자리에 있는 경우 인식 못함 
-
-입력 이미지 더 멀리 디지스트쪽에 빨간불이 더 있으나 인식 못함 
-
-: 인식범위 한계 = 500~600m (카메라 성능에 따라 달라질듯) 
-
- 
-
- 
-
-약간 어두워지기 시작한 케이스 
-
- 
-
-추후 첨부 
-
- 
-
- 
-
- 
-
-※ 메모리 부족할시 
-
-1. zram (메모리 압축 영역) 확장  
+1. zram (memory compaction) extension
 
  	 
 
-따라서 zram을 기본값 2gb에서 4gb로 확장하여 사용하도록 함  
+to make zram 2gb(default) to 4gb  
 
-첨부한 링크의 쉘 스크립트 파일을 사용하면 쉽게 수정 가능함  
-
- 	 
-
+you can easily change through shell script file from the link
+ 	
 https://github.com/JetsonHacksNano/resizeSwapMemory  
 
  	 
 
  	 
 
-2. zram 해제  
+2. zram cancellation
 
   
 
-zram의 크기를 너무 크게 설정할 경우 오히려 성능에 지장이 갈 수 있으므로, 더 많은 메모리가 필요한 경우 swap file을 이용하도록 함  
+if you allocate zram too much, it might cause poor performance, if you need more memory, use swap file.
 
   
-
+```
 sudo systemctl disable nvzramconfig  
-
+```
   
 
 https://github.com/dusty-nv/jetson-inference/blob/master/docs/pytorch-transfer-learning.md  
@@ -307,22 +246,21 @@ https://github.com/dusty-nv/jetson-inference/blob/master/docs/pytorch-transfer-l
 
  	 
 
-3. swap file 설정  
+3. swap file setting
 
  	 
 
-Tensorflow는 gpu 메모리를 가상 장치의 형태로 미리 할당받아 사용함  
+Tensorflow usually allocate gpu memory with virtual mcachine form.
 
-Jetson Nano는 4gb 메모리를 cpu, gpu가 함께 사용함  
+But for example, Jetson Nano share cpu, gpu memory 4GB  
 
-TensorRT 모델 빌드 작업의 경우 cpu, gpu가 동시에 많은 양의 메모리를 사용함  
+And also 'TensorRT build' use cpu, gpu both a lot of memory (RAM)  
 
-gpu에 메모리를 많이 할당한 경우 남아있는 적은 양의 메모리로 모든 cpu 작업을 처리하기 위해 스왑이 너무 자주 일어나 전체적인 작업 속도가 매우 느려짐  
+If 'build' allocate gpu a lot of memory, swaps occur too often to handle all cpu operations with a small amount of memory left, resulting in very slow overall operations  
 
-따라서 zram이 사용하던 공간을 임시로 해제하고 swap file로 대체하여 스왑이 일어나는 빈도를 줄임  
+Therefore, we need to temporarily releases the space used by zram and replaces it with swap files to reduce the frequency of swaps.  
 
-첨부한 링크의 쉘 스크립트 파일을 사용하면 쉽게 수정 가능함  
-
+You can easily modify using shell script files in the link.
  	 
 
 https://github.com/JetsonHacksNano/installSwapfile  
@@ -331,25 +269,25 @@ https://github.com/JetsonHacksNano/installSwapfile 
 
  	 
 
-4. GUI 비활성화  
+4. GUI deactivation
 
   
-
+```
 sudo systemctl set-default multi-user.target  
 
 sudo reboot  
-
+```
  
 
  ---
 
-※ 참고 사이트 
+※ Reference Site
 
-Jetpack 설치 : https://developer.nvidia.com/jetpack-sdk-463  
+Jetpack installation : https://developer.nvidia.com/jetpack-sdk-463  
 
 https://catalog.ngc.nvidia.com/orgs/nvidia/containers/l4t-tensorflow  
 
-Tensorflow 직접 설치 : https://forums.developer.nvidia.com/t/tensorflow-for-jetson-tx2/64596  
+(Optional) Tensorflow installation locally : https://forums.developer.nvidia.com/t/tensorflow-for-jetson-tx2/64596  
 
 Tf-trt : https://www.tensorflow.org/api_docs/python/tf/experimental/tensorrt/Converter  
 
