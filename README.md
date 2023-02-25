@@ -8,8 +8,8 @@
 
 We have to install l4t r32.7.1 which is for Jetpack 4.6.3. 
 ```
-$ sudo docker pull nvcr.io/nvidia/l4t-tensorflow:r35.2.1-tf2.11-py3 
-$ sudo docker run -it --rm --runtime nvidia --network host -v /home/user/project:/location/in/container nvcr.io/nvidia/l4t-tensorflow:r35.2.1-tf2.11-py3 
+sudo docker pull nvcr.io/nvidia/l4t-tensorflow:r35.2.1-tf2.11-py3 
+sudo docker run -it --rm --runtime nvidia --network host -v /home/user/project:/location/in/container nvcr.io/nvidia/l4t-tensorflow:r35.2.1-tf2.11-py3 
 ```
  
 
@@ -17,13 +17,13 @@ $ sudo docker run -it --rm --runtime nvidia --network host -v /home/user/project
 
  ※ (Optional) Tensorflow installation locally.
 ```
-$ sudo apt-get update 
-$ sudo apt-get install libhdf5-serial-dev hdf5-tools libhdf5-dev zlib1g-dev zip libjpeg8-dev $ liblapack-dev libblas-dev gfortran                                                                                                  
-$ sudo apt-get install python3-pip 
-$ sudo pip3 install -U pip testresources setuptools 
-$ sudo ln -s /usr/include/locale.h /usr/include/xlocale.h 
-$ sudo pip3 install -U numpy==1.19.4 future mock keras_preprocessing keras_applications gast==0.2.1 protobuf pybind11 cython pkgconfig packaging 
-$ sudo pip3 install --extra-index-url https://developer.download.nvidia.com/compute/redist/jp/v461 tensorflow 
+sudo apt-get update 
+sudo apt-get install libhdf5-serial-dev hdf5-tools libhdf5-dev zlib1g-dev zip libjpeg8-dev $ liblapack-dev libblas-dev gfortran
+sudo apt-get install python3-pip 
+sudo pip3 install -U pip testresources setuptools 
+sudo ln -s /usr/include/locale.h /usr/include/xlocale.h 
+sudo pip3 install -U numpy==1.19.4 future mock keras_preprocessing keras_applications gast==0.2.1 protobuf pybind11 cython pkgconfig packaging 
+sudo pip3 install --extra-index-url https://developer.download.nvidia.com/compute/redist/jp/v461 tensorflow 
 ```
  
 
@@ -111,7 +111,7 @@ max_workspace_size_bytes: integer, Maximum GPU memory for TF-TRT
 
 after put 'saved mode.pb' from Tensorflow on SAVED_MODEL_DIR location,  
 ```
-$ python3 tf-trt.py$ python3 tf-trt.py 
+python3 tf-trt.py$ python3 tf-trt.py 
 ```
 after that, you may check new tensorRT optimized .pb file on OUTPUT_SAVED_MODEL_DIR. 
 
