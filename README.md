@@ -83,6 +83,14 @@ after that, you may check new tensorRT optimized .pb file on OUTPUT_SAVED_MODEL_
 
 <br/>
 
+※ command example
+
+```
+python3 test.py
+```
+
+<br/>
+
 results of 'test.py'
 
 Nano : 5 fps -> 7 fps, NX : 7 fps -> 12 fps, AGX : 15 fps -> 30 fps 
