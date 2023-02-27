@@ -31,11 +31,15 @@ sudo pip3 install --extra-index-url https://developer.download.nvidia.com/comput
 
 **2. Frozen graph – saved model coversion 'frozen_graph_to_saved_model.py'**
 
+<br/>
+
 Normally, we can save information of our model / training with .pb filename extension from Tensorflow 
 
 There is two ways - 1) Frozen graph 2) saved model
 
 If you currently have frozen graph form, we cannot change parameter inside, so we do have to change it to saved model form.
+
+<br/>
 
 ※ command example
 
