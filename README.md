@@ -36,55 +36,13 @@ Normally, we can save information of our model / training with .pb filename exte
 There is two ways - 1) Frozen graph 2) saved model
 
 If you currently have frozen graph form, we cannot change parameter inside, so we do have to change it to saved model form.
+
+※ command example
+
 ```
-import numpy as np 
-from tensorflow.keras.preprocessing import image 
-import tensorflow as tf 
-from tensorflow.python.saved_model import tag_constants 
-from tensorflow.keras.applications.mobilenet import preprocess_input, decode_predictions 
-import time 
- 
-batch_size = 1 
-batched_input = np.zeros((batch_size, 360, 640, 3), dtype=np.uint8) 
- 
-for i in range(batch_size): 
-    img_path = './data/img%d.JPG' % (i % 4) 
-    img = image.load_img(img_path, target_size=(360, 640)) 
-    x = image.img_to_array(img) 
-    x = np.expand_dims(x, axis=0) 
-    x = preprocess_input(x) 
-    batched_input[i, :] = x 
-batched_input = tf.constant(batched_input) 
-print('batched_input shape: ', batched_input.shape) 
- 
- 
-def benchmark_tftrt(input_saved_model): 
-    saved_model_loaded = tf.saved_model.load( 
-        input_saved_model, tags=[tag_constants.SERVING]) 
-    infer = saved_model_loaded.signatures['serving_default'] 
- 
-    N_warmup_run = 50 
-    N_run = 1000 
-    elapsed_time = [] 
- 
-    for i in range(N_warmup_run): 
-        labeling = infer(batched_input) 
- 
-    for i in range(N_run): 
-        start_time = time.time() 
-        labeling = infer(batched_input) 
-        end_time = time.time() 
-        elapsed_time = np.append(elapsed_time, end_time - start_time) 
-        if i % 50 == 0: 
-            print('Step {}: {:4.1f}ms'.format( 
-                i, (elapsed_time[-50:].mean()) * 1000)) 
- 
-    print('Throughput: {:.0f} images/s'.format(N_run * 
-                                               batch_size / elapsed_time.sum())) 
- 
- 
-benchmark_tftrt(".") 
+python3 frozen_graph_to_saved_model.py
 ```
+
 when we change frozen graph to saved model, we have to know information about output node.  
 
 On our example, model is ssd mobilenet v1, 'num_detections', 'detection_scores', 'detection_boxes', 'detection_classes' are output nodes.
@@ -93,7 +51,7 @@ On our example, model is ssd mobilenet v1, 'num_detections', 'detection_scores',
 
  <br/><br/>
 
-**3. tf-trt ptimization from saved model**
+**3. tf-trt optimization from saved model**
 
 build file 'tf-trt.py'
 
@@ -115,95 +73,10 @@ python3 tf-trt.py
 ```
 after that, you may check new tensorRT optimized .pb file on OUTPUT_SAVED_MODEL_DIR. 
 
-<br/>
-
-```
-import tensorflow as tf 
-from tensorflow.python.compiler.tensorrt import trt_convert as trt 
-import numpy as np 
- 
-gpu_devices = tf.config.experimental.list_physical_devices('GPU') 
-tf.config.experimental.set_memory_growth(gpu_devices[0], True) 
-tf.config.experimental.set_virtual_device_configuration( 
-    gpu_devices[0], 
-    [tf.config.experimental.VirtualDeviceConfiguration( 
-        memory_limit=3072)]) 
- 
-SAVED_MODEL_DIR = "." 
-OUTPUT_SAVED_MODEL_DIR = "saved_model_TFTRT_uint8" 
- 
- 
-def input_fn(): 
-    yield [np.random.randint(low=0, high=255, size=(16, 360, 640, 3), dtype=np.uint8)] 
- 
- 
-# Instantiate the TF-TRT converter 
-converter = trt.TrtGraphConverterV2( 
-    input_saved_model_dir=SAVED_MODEL_DIR, 
-    max_workspace_size_bytes=1 << 26, 
-    precision_mode=trt.TrtPrecisionMode.FP16, 
-    maximum_cached_engines=1, 
-) 
- 
-# Convert the model into TRT compatible segments 
-trt_func = converter.convert() 
-converter.summary() 
- 
-converter.build(input_fn=input_fn) 
-converter.save(output_saved_model_dir=OUTPUT_SAVED_MODEL_DIR) 
-```
   <br/><br/>
 
 2. test file for checking speed - 'test.py' 
-```
-import numpy as np 
-from tensorflow.keras.preprocessing import image 
-import tensorflow as tf 
-from tensorflow.python.saved_model import tag_constants 
-from tensorflow.keras.applications.mobilenet import preprocess_input, decode_predictions 
-import time 
- 
-batch_size = 1 
-batched_input = np.zeros((batch_size, 360, 640, 3), dtype=np.uint8) 
- 
-for i in range(batch_size): 
-    img_path = './data/img%d.JPG' % (i % 4) 
-    img = image.load_img(img_path, target_size=(360, 640)) 
-    x = image.img_to_array(img) 
-    x = np.expand_dims(x, axis=0) 
-    x = preprocess_input(x) 
-    batched_input[i, :] = x 
-batched_input = tf.constant(batched_input) 
-print('batched_input shape: ', batched_input.shape) 
- 
- 
-def benchmark_tftrt(input_saved_model): 
-    saved_model_loaded = tf.saved_model.load( 
-        input_saved_model, tags=[tag_constants.SERVING]) 
-    infer = saved_model_loaded.signatures['serving_default'] 
- 
-    N_warmup_run = 50 
-    N_run = 1000 
-    elapsed_time = [] 
- 
-    for i in range(N_warmup_run): 
-        labeling = infer(batched_input) 
- 
-    for i in range(N_run): 
-        start_time = time.time() 
-        labeling = infer(batched_input) 
-        end_time = time.time() 
-        elapsed_time = np.append(elapsed_time, end_time - start_time) 
-        if i % 50 == 0: 
-            print('Step {}: {:4.1f}ms'.format( 
-                i, (elapsed_time[-50:].mean()) * 1000)) 
- 
-    print('Throughput: {:.0f} images/s'.format(N_run * 
-                                               batch_size / elapsed_time.sum())) 
- 
- 
-benchmark_tftrt(".") 
-```
+
 <br/>
 
 results of 'test.py'
