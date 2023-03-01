@@ -1,4 +1,4 @@
-# Running object detection model on jetson platform using TF-TRT
+# Using frozen graph through tensorRT for object detection from jetson platform
 
 - Jetpack 4.6.3 (https://developer.nvidia.com/jetpack-sdk-463) 
 
